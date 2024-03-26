@@ -20,7 +20,22 @@ class RGB_Camera_Controller:
         self.camera.Width.Value = 1920
         self.camera.Height.Value = 1080
         self.camera.PixelFormat = "RGB8"
-        
+
+    def acquire_image(self):
+        # Získání snímku
+        try:
+            with self.camera.RetrieveResult(5000) as result:
+                if result.GrabSucceeded():
+                    # Převod na numpy array
+                    image = result.Array
+                    return image
+                else:
+                    print("Chyba při získávání snímku.")
+                    return None
+        except genicam.GenericException as e:
+            print("Chyba při získávání snímku:", e)
+            return None
+         
     def capture_image(self):
         # Získání snímku z kamery
         img = self.camera.GrabOne(1000)  # Timeout 1000 ms

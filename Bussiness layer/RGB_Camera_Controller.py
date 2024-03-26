@@ -22,17 +22,22 @@ class RGB_Camera_Controller:
         self.camera.PixelFormat = "RGB8"
 
     def acquire_image(self):
-        # Získání snímku
         try:
-            with self.camera.RetrieveResult(5000) as result:
-                if result.GrabSucceeded():
-                    # Převod na numpy array
-                    image = result.Array
-                    return image
-                else:
-                    print("Chyba při získávání snímku.")
-                    return None
-        except genicam.GenericException as e:
+            if self.camera.IsGrabbing():
+                self.camera.StopGrabbing()
+
+            self.camera.StartGrabbing(pylon.GrabStrategy_LatestImageOnly)
+
+            grab_result = self.camera.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
+
+            if grab_result.GrabSucceeded():
+                image = grab_result.Array
+                grab_result.Release()
+                return image
+            else:
+                print("Chyba při získávání snímku.")
+                return None
+        except Exception as e:
             print("Chyba při získávání snímku:", e)
             return None
          

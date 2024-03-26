@@ -42,6 +42,7 @@ if __name__ == "__main__":
         '{"jsonrpc": "2.0", "method": "stop_recording", "params": {}, "id": 3}',
         '{"jsonrpc": "2.0", "method": "get_file_reader", "params": {}, "id": 4}'
     ]
+    
     for request in requests:
         response = await dispatch(request, sensor_controller)
         print(response)

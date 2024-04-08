@@ -11,15 +11,15 @@ import cv2
 
 class RGB_Camera_Controller:
     
-    def __init__(self):
+    def __init__(self, cameraWith = 1920, cameraHeight = 1080, cameraFormat = "RGB8"):
         # Inicializace kamery
         self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
         self.camera.Open()
         
         # Nastavení parametrů kamery
-        self.camera.Width.Value = 1920
-        self.camera.Height.Value = 1080
-        self.camera.PixelFormat = "RGB8"
+        self.camera.Width.Value = cameraWith
+        self.camera.Height.Value = cameraHeight
+        self.camera.PixelFormat = cameraFormat
 
     def acquire_image(self):
         try:

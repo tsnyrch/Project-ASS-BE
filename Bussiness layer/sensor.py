@@ -66,9 +66,14 @@ class SensorController:
     def Connect(self):
         self.client_socket.connect((self.IP_ADDR, self.PORT))
 
-    def Call(self, method, id):
+    def Call(self, method, id, params = {}):
         # Vytvoření slovníku s hodnotami pro volání
-        call_values = {'jsonrpc': '2.0', 'method': method, 'id': id}
+        call_values = {
+            'jsonrpc': '2.0', 
+            'method': method, 
+            'id': id,
+            "params": params
+        }
 
         # Převod slovníku na řetězec JSON
         json_string = json.dumps(call_values)
@@ -85,16 +90,16 @@ class SensorController:
         return response_string 
 
 
-    def Generate_rec_folder_name(self, id):
+    def Generate_rec_folder_name(self, id, prefix, use_date, use_m, use_sec, name_delimeter, time_delimeter, now):
         return self.Call(self.methods["GRFN"], id)
 
-    def Compare_versions(self, id):
+    def Compare_versions(self, id, ver_a, ver_b):
         return self.Call("Compare_versions", id)
 
-    def Assert_min_version(self, id):
+    def Assert_min_version(self, id, min_version, assert_time):
         return self.Call("Assert_min_version", id)
 
-    def Copy_json(self, id):
+    def Copy_json(self, id, obj):
         return self.Call("Copy_json", id)
 
     def Print_json(self, id):
@@ -127,7 +132,8 @@ class SensorController:
     def ClearLiveData(self, id):
         return self.Call("ClearLiveData", id)
 
-    def StartRecording(self, id):
+    def StartRecording(self, id, measurement_name = "pokus", record_history_secs = 0):
+        params = {"measurement_name": measurement_name, "record_history_secs": record_history_secs}
         return self.Call("StartRecording", id)
 
     def PauseRecording(self, id):
@@ -160,17 +166,20 @@ class SensorController:
     def OpenFileReaderByPath(self, id):
         return self.Call("OpenFileReaderByPath", id)
 
-    def OpenFileReaderByName(self, id):
-        return self.Call("OpenFileReaderByName", id)
+    def OpenFileReaderByName(self, id, name = "pokus"):
+        params = {"name": name}
+        return self.Call("OpenFileReaderByName", id, params)
 
     def SetFileReaderPath(self, id):
         return self.Call("SetFileReaderPath", id)
 
-    def GetFileReaderInfo(self, id):
+    def GetFileReaderInfo(self, id, reader_id = 100084):
+        params = {"reader_id": reader_id}
         return self.Call("GetFileReaderInfo", id)
 
-    def GetFileReaderData(self, id):
-        return self.Call("GetFileReaderData", id)
+    def GetFileReaderData(self, id, reader_id = 100084):
+        params = {"reader_id": reader_id}
+        return self.Call("GetFileReaderData", id, params)
 
     def ExportFileReaderData(self, id):
         return self.Call("ExportFileReaderData", id)
@@ -205,27 +214,18 @@ class SensorController:
     def GetSubItems(self, id):
         return self.Call("GetSubItems", id)
 
-    # --------------------------------------
-    def start_recording(self):
-        # implementace operace pro start záznamu
-        return "Recording started."
-
-    def pause_recording(self):
-        # implementace operace pro pozastavení záznamu
-        return "Recording paused."
-
-    def stop_recording(self):
-        # implementace operace pro zastavení záznamu
-        return "Recording stopped."
-
-    def get_file_reader(self):
-        # implementace operace pro získání čtečky souborů
-        return "File reader obtained."
-
 # Příklad použití třídy
 if __name__ == "__main__":
-    sensor = SensorController("localhost", 40999)
-    response_string = sensor.GetSystemTime(001)
+    sensor = SensorController("192.168.0.196", 40999)
+    sensor.Connect()
+    # response_string = sensor.GetSystemTime("001")
+    # response_string = sensor.GetSensors("001")
+    # response_string = sensor.GetConfiguration("001") {"jsonrpc":"2.0","id":"001","error":{"code":3,"message":"Unknown method: GetConfiguration"}}
+    #response_string = sensor.StartRecording("001")
+    # response_string = sensor.StopRecording("001")
+    # response_string = sensor.OpenFileReaderByName("001")
+    # response_string = sensor.GetFileReaderInfo("001")
+    response_string = sensor.GetFileReaderData("001")
 
     # Vypsání odpovědi
     print("Response from server:", response_string)

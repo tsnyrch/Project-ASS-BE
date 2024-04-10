@@ -555,4 +555,4 @@ if __name__ == "__main__":
     # response_string = sensor.GetFileReaderData("001")
 
     # Vypsání odpovědi
-    print("Response from server:", response_string)
+    # print("Response from server:", response_string)

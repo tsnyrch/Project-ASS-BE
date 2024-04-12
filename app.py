@@ -6,6 +6,7 @@
 ## Documentation: https://medium.com/@asvinjangid.kumar/creating-your-own-api-in-python-a-beginners-guide-59f4dd18d301
 #################################################
 
+import os
 from flask import Flask, jsonify, abort 
 from config import Config
 #import BussinessLayer.SensoreService
@@ -51,4 +52,5 @@ def SensoreStop():
     return jsonify(message='Hello, World!')
  
 if __name__ == '__main__':  
-   app.run(debug = True)
+   port = int(os.environ.get('PORT', 5000))
+   app.run(debug = True, host='0.0.0.0', port=port)

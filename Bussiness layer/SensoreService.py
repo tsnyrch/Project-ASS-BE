@@ -9,7 +9,7 @@ class SensoreService:
         self.RGB_Camera_Controller = RGB_Camera_Controller
         self.Multispectral_Camera_Controller = Multispectral_Camera_Controller
 
-    def StartMesurement():
+    def StartMesurement(self):
         try:
             time = self.SensorController.GetSystemTime("001")
             sensors = self.SensorController.GetSensors("001")
@@ -22,7 +22,7 @@ class SensoreService:
             print("Nastala chyba při zpracování náhrávání")
             return 
     
-    def StopMesurement():
+    def StopMesurement(self):
         time = self.SensorController.StopRecording("001")
         return 0
 

@@ -32,24 +32,21 @@ rGB_Camera_Controller = RGB_Camera_Controller()
 def hello_world():
     return "<p>Hello, World!</p>"
 
+# RGB camera endpoints
 @app.route('/sensor/rgb/start', methods=['GET'])
 def SensorStart(config:RGB_Camera_Start):
     data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = config.name, quality = config.quality, image_format=config.image_format)
     return jsonify(data)
 
-# RGB camera endpoints
-@app.route('/sensor/rgb/stop', methods=['GET'])
-def SensoreStop():
-    return jsonify(message='Hello, World!')
-
-@app.route('/sensor/rgb/config', methods=['POST'])
-def SensoreStop():
-    return jsonify(message='Hello, World!')
-
-@app.route('/sensor/rgb/data', methods=['GET'])
-def SensoreStop():
-    return jsonify(message='Hello, World!')
-
+@app.route('/sensor/rgb/config', methods=['GET'])
+def SensorStart(config:RGB_Camera_Start):
+    return jsonify(
+        {
+            "data_type:": rGB_Camera_Controller.save_functions.keys,
+            "width": rGB_Camera_Controller.camera.Width.Value,
+            "height": rGB_Camera_Controller.camera.Height.Value,
+        }
+    )
 
 # Acustic Sensor endpoints
 @app.route('/sensor/acustic/config', methods=['GET'])

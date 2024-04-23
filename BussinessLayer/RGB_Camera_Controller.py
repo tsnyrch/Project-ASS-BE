@@ -19,9 +19,9 @@ class RGB_Camera_Controller:
         # Nastavení parametrů kamery
         self.camera.Width.Value = cameraWith
         self.camera.Height.Value = cameraHeight
-        self.camera.PixelFormat = cameraFormat
-
-    def acquire_image(self):
+        #self.camera.PixelFormat = cameraFormat
+         
+    def capture_image(self):
         try:
             if self.camera.IsGrabbing():
                 self.camera.StopGrabbing()
@@ -40,33 +40,6 @@ class RGB_Camera_Controller:
         except Exception as e:
             print("Chyba při získávání snímku:", e)
             return None
-         
-    def capture_image(self):
-        # Získání snímku z kamery
-        img = self.camera.GrabOne(1000)  # Timeout 1000 ms
-        if img.GrabSucceeded():
-            # Konverze na OpenCV formát
-            image = img.Array
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-            return image
-        else:
-            print("Chyba při získávání snímku.")
-            return None
-        
-    def capture_image(self, count = 100):
-        # count == numberOfImagesToGrab
-        self.camera.StartGrabbingMax(count)
-
-        while self.camera.IsGrabbing():
-            grabResult = self.camera.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
-
-            if grabResult.GrabSucceeded():
-                # Access the image data.
-                print("SizeX: ", grabResult.Width)
-                print("SizeY: ", grabResult.Height)
-                img = grabResult.Array
-                print("Gray value of first pixel: ", img[0, 0])
-
         
     def release_camera(self):
         # Uvolnění kamery
@@ -75,13 +48,5 @@ class RGB_Camera_Controller:
 # Příklad použití třídy
 if __name__ == "__main__":
     camera_controller = RGB_Camera_Controller()
-    while True:
-        # Získání snímku
-        frame = camera_controller.capture_image()
-        if frame is not None:
-            # Zobrazit snímek
-            cv2.imshow("RGB Camera", frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break  # Ukončení smyčky po stisku klávesy 'q'
-    camera_controller.release_camera()
-    cv2.destroyAllWindows()
+    val = camera_controller.capture_image()
+    print(val)

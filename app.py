@@ -11,9 +11,11 @@ from flask import Flask, jsonify, abort
 from config import Config
 #import BussinessLayer.SensoreService
 #from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
-#from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
+from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
 from BussinessLayer.SensorController import SensorController
  
+from data.RGB_camera import RGB_Camera_Start
+
 # instance of flask application
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -23,15 +25,39 @@ app.config.from_object(Config)
 # definition of confrollers
 sensorController = SensorController("192.168.0.196", 40999)
 #multispectral_Camera_Controller = Multispectral_Camera_Controller()
-#rGB_Camera_Controller = RGB_Camera_Controller()
+rGB_Camera_Controller = RGB_Camera_Controller()
 
 # home route that returns below text when root url is accessed
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
 
-@app.route('/sensor/start', methods=['GET'])
-def SensorStart():
+@app.route('/sensor/rgb/start', methods=['GET'])
+def SensorStart(config:RGB_Camera_Start):
+    data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = config.name, quality = config.quality, image_format=config.image_format)
+    return jsonify(data)
+
+# RGB camera endpoints
+@app.route('/sensor/rgb/stop', methods=['GET'])
+def SensoreStop():
+    return jsonify(message='Hello, World!')
+
+@app.route('/sensor/rgb/config', methods=['POST'])
+def SensoreStop():
+    return jsonify(message='Hello, World!')
+
+@app.route('/sensor/rgb/data', methods=['GET'])
+def SensoreStop():
+    return jsonify(message='Hello, World!')
+
+
+# Acustic Sensor endpoints
+@app.route('/sensor/acustic/config', methods=['GET'])
+def SensoreStop():
+    return jsonify(message='Hello, World!')
+
+@app.route('/sensor/acustic/start', methods=['GET'])
+def SensoreStop():
     ##
     try:
         result = {
@@ -47,7 +73,7 @@ def SensorStart():
     except:
         abort(500)
 
-@app.route('/sensor/stop', methods=['GET'])
+@app.route('/sensor/acustic/data', methods=['POST'])
 def SensoreStop():
     return jsonify(message='Hello, World!')
  

@@ -11,7 +11,7 @@ from flask import Flask, jsonify, abort
 from config import Config
 
 from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
-#from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
+from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
 from BussinessLayer.SensorController import SensorController
  
 from data.RGB_camera import RGB_Camera_Start
@@ -40,11 +40,14 @@ def hello_world():
 # RGB camera endpoints
 @app.route('/sensor/rgb/start', methods=['GET'])
 def SensorStart(config:RGB_Camera_Start):
+    rGB_Camera_Controller = GetRGB_Camera_Controller()
+    rGB_Camera_Controller.Connect()
     data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = config.name, quality = config.quality, image_format=config.image_format)
     return jsonify(data)
 
 @app.route('/sensor/rgb/config', methods=['GET'])
 def SensorStart(config:RGB_Camera_Start):
+    rGB_Camera_Controller = GetRGB_Camera_Controller()
     return jsonify(
         {
             "data_type:": rGB_Camera_Controller.save_functions.keys,
@@ -57,36 +60,43 @@ def SensorStart(config:RGB_Camera_Start):
 
 # Acustic Sensor endpoints
 @app.route('/sensor/acustic/start', methods=['GET'])
-def SensoreStart():
+def SensoreStart(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.StartRecording("001"))
 
 @app.route('/sensor/acustic/stop', methods=['GET'])
-def SensoreStop():
+def SensoreStop(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.StopRecording("001"))
 
 @app.route('/sensor/acustic/pause', methods=['POST'])
-def SensorePause():
+def SensorePause(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.PauseRecording("001"))
 
 @app.route('/sensor/acustic/state', methods=['POST'])
-def SensoreState():
+def SensoreState(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.GetRecordingState("001"))
 
 @app.route('/sensor/acustic/', methods=['GET'])
-def Sensors():
+def Sensors(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify({
         "sensors": sensorController.GetSensors,
         "time": sensorController.GetSystemTime,
     })
 
 @app.route('/sensor/acustic/config', methods=['GET'])
-def SensoreConfig(name:str, verbosity:str):
+def SensoreConfig(name:str, verbosity:str, ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify({
         "config": sensorController.GetConfiguration("001", name=name, verbsity=verbosity),
     })
 
 @app.route('/sensor/acustic/config', methods=['POST'])
-def SensoreConfig(config:object, verbosity:str):
+def SensoreConfig(config:object, verbosity:str, ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify({
         "config": sensorController.Configure("001", config=config, verbsity=verbosity),
     })

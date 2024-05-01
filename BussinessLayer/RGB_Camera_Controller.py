@@ -24,7 +24,7 @@ class RGB_Camera_Controller:
         # Nastavení parametrů kamery
         self.camera.Width.Value = cameraWith
         self.camera.Height.Value = cameraHeight
-        self.camera.PixelFormat = cameraFormat
+        #self.camera.PixelFormat = cameraFormat
 
     def Connect(self):
         # Inicializace kamery

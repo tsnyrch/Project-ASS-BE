@@ -9,8 +9,8 @@
 import os
 from flask import Flask, jsonify, abort 
 from config import Config
-#import BussinessLayer.SensoreService
-#from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
+
+from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
 #from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
 from BussinessLayer.SensorController import SensorController
  
@@ -20,10 +20,15 @@ app.config.from_object(Config)
 #from .routes import api
 #app.register_blueprint(api)
 
-# definition of confrollers
-sensorController = SensorController("192.168.0.196", 40999)
-#multispectral_Camera_Controller = Multispectral_Camera_Controller()
-#rGB_Camera_Controller = RGB_Camera_Controller()
+
+def GetSensorController(ip, port):
+    return SensorController(ip, port)
+
+def GetMultispecCameraController():
+    return Multispectral_Camera_Controller()
+
+def GetRGB_Camera_Controller():
+    return RGB_Camera_Controller()
 
 # home route that returns below text when root url is accessed
 @app.route("/")
@@ -54,3 +59,4 @@ def SensoreStop():
 if __name__ == '__main__':  
    port = int(os.environ.get('PORT', 5000))
    app.run(debug = True, host='0.0.0.0', port=port)
+   # "192.168.0.196", 40999

@@ -11,7 +11,7 @@ import json
 from flask import Flask, jsonify, abort, request
 from config import Config
 
-from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
+#from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
 from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
 from BussinessLayer.SensorController import SensorController
  
@@ -89,14 +89,14 @@ def SensorAcustic():
     })
 
 @app.route('/sensor/acustic/config', methods=['GET'])
-def SensoreConfig(name:str, verbosity:str):
+def SensoreConfigGet():
     sensorController = GetSensorController(request.form['ip'], request.form['port'])
     return jsonify({
         "config": sensorController.GetConfiguration("001", name=request.form['name'], verbsity=request.form['verbsity']),
     })
 
 @app.route('/sensor/acustic/config', methods=['POST'])
-def SensoreConfig(config:object, verbosity:str):
+def SensoreConfigSet():
     obj = json.loads(request.json) # {config:object, verbosity:str}
     sensorController = GetSensorController(request.form['ip'], request.form['port'])
     return jsonify({

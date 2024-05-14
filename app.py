@@ -44,7 +44,7 @@ def CameraRgbStart():
     config = request.json
     rGB_Camera_Controller = GetRGB_Camera_Controller()
     rGB_Camera_Controller.Connect()
-    data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = 1, quality = config.quality, image_format=config.image_format)
+    data = rGB_Camera_Controller.capture_image(path = config["path"], name = config["name"], count = 1, quality = config["quality"], image_format=config["image_format"])
     return jsonify(data)
 
 @app.route('/sensor/rgb/config', methods=['GET'])
@@ -100,7 +100,7 @@ def SensoreConfigSet():
     obj = request.json # {config:object, verbosity:str}
     sensorController = GetSensorController(request.form['ip'], request.form['port'])
     return jsonify({
-        "config": sensorController.Configure("001", config=obj.config, verbsity=obj.verbosity),
+        "config": sensorController.Configure("001", config=obj["config"], verbsity=obj["verbosity"]),
     })
  
 if __name__ == '__main__':  

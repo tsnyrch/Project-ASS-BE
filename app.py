@@ -28,7 +28,7 @@ def GetSensorController(ip, port):
     return SensorController(ip, port)
 
 def GetMultispecCameraController():
-    return Multispectral_Camera_Controller()
+    return {}#Multispectral_Camera_Controller()
 
 def GetRGB_Camera_Controller():
     return RGB_Camera_Controller()

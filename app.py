@@ -7,7 +7,8 @@
 #################################################
 
 import os
-from flask import Flask, jsonify, abort 
+import json
+from flask import Flask, jsonify, abort, request
 from config import Config
 #import BussinessLayer.SensoreService
 #from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
@@ -33,13 +34,15 @@ def hello_world():
     return "<p>Hello, World!</p>"
 
 # RGB camera endpoints
-@app.route('/sensor/rgb/start', methods=['GET'])
-def SensorStart(config:RGB_Camera_Start):
-    data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = config.name, quality = config.quality, image_format=config.image_format)
+@app.route('/sensor/rgb/start', methods=['POST'])
+def SensorStart():
+    config = json.loads(request.json)
+    data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = 1, quality = config.quality, image_format=config.image_format)
     return jsonify(data)
 
 @app.route('/sensor/rgb/config', methods=['GET'])
-def SensorStart(config:RGB_Camera_Start):
+def SensorStart():
+    config = json.loads(request.json) #in body 
     return jsonify(
         {
             "data_type:": rGB_Camera_Controller.save_functions.keys,
@@ -47,8 +50,6 @@ def SensorStart(config:RGB_Camera_Start):
             "height": rGB_Camera_Controller.camera.Height.Value,
         }
     )
-
-
 
 # Acustic Sensor endpoints
 @app.route('/sensor/acustic/start', methods=['GET'])
@@ -75,15 +76,16 @@ def Sensors():
     })
 
 @app.route('/sensor/acustic/config', methods=['GET'])
-def SensoreConfig(name:str, verbosity:str):
+def SensoreConfig():
     return jsonify({
-        "config": sensorController.GetConfiguration("001", name=name, verbsity=verbosity),
+        "config": sensorController.GetConfiguration("001", name=request.form['name'], verbsity=request.form['verbsity']),
     })
 
 @app.route('/sensor/acustic/config', methods=['POST'])
-def SensoreConfig(config:object, verbosity:str):
+def SensoreConfig():
+    obj = json.loads(request.json) # in body {config:object, verbosity:str}
     return jsonify({
-        "config": sensorController.Configure("001", config=config, verbsity=verbosity),
+        "config": sensorController.Configure("001", config=obj.config, verbsity=obj.verbosity),
     })
  
 if __name__ == '__main__':  

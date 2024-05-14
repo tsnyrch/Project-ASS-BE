@@ -41,7 +41,7 @@ def hello_world():
 # RGB camera endpoints
 @app.route('/sensor/rgb/start', methods=['POST'])
 def CameraRgbStart():
-    config = json.loads(request.json)
+    config = request.json
     rGB_Camera_Controller = GetRGB_Camera_Controller()
     rGB_Camera_Controller.Connect()
     data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = 1, quality = config.quality, image_format=config.image_format)
@@ -97,7 +97,7 @@ def SensoreConfigGet():
 
 @app.route('/sensor/acustic/config', methods=['POST'])
 def SensoreConfigSet():
-    obj = json.loads(request.json) # {config:object, verbosity:str}
+    obj = request.json # {config:object, verbosity:str}
     sensorController = GetSensorController(request.form['ip'], request.form['port'])
     return jsonify({
         "config": sensorController.Configure("001", config=obj.config, verbsity=obj.verbosity),

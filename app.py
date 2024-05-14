@@ -10,8 +10,8 @@ import os
 import json
 from flask import Flask, jsonify, abort, request
 from config import Config
-#import BussinessLayer.SensoreService
-#from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
+
+from BussinessLayer.MultiSpectral_Camera_Controller import Multispectral_Camera_Controller
 from BussinessLayer.RGB_Camera_Controller import RGB_Camera_Controller
 from BussinessLayer.SensorController import SensorController
  
@@ -23,10 +23,15 @@ app.config.from_object(Config)
 #from .routes import api
 #app.register_blueprint(api)
 
-# definition of confrollers
-sensorController = SensorController("192.168.0.196", 40999)
-#multispectral_Camera_Controller = Multispectral_Camera_Controller()
-rGB_Camera_Controller = RGB_Camera_Controller()
+
+def GetSensorController(ip, port):
+    return SensorController(ip, port)
+
+def GetMultispecCameraController():
+    return Multispectral_Camera_Controller()
+
+def GetRGB_Camera_Controller():
+    return RGB_Camera_Controller()
 
 # home route that returns below text when root url is accessed
 @app.route("/")
@@ -35,14 +40,17 @@ def hello_world():
 
 # RGB camera endpoints
 @app.route('/sensor/rgb/start', methods=['POST'])
-def SensorStart():
+def CameraRgbStart():
     config = json.loads(request.json)
+    rGB_Camera_Controller = GetRGB_Camera_Controller()
+    rGB_Camera_Controller.Connect()
     data = rGB_Camera_Controller.capture_image(path = config.path, name = config.name, count = 1, quality = config.quality, image_format=config.image_format)
     return jsonify(data)
 
 @app.route('/sensor/rgb/config', methods=['GET'])
-def SensorStart():
+def CameraRgbConfig():
     config = json.loads(request.json) #in body 
+    rGB_Camera_Controller = GetRGB_Camera_Controller()
     return jsonify(
         {
             "data_type:": rGB_Camera_Controller.save_functions.keys,
@@ -53,37 +61,41 @@ def SensorStart():
 
 # Acustic Sensor endpoints
 @app.route('/sensor/acustic/start', methods=['GET'])
-def SensoreStart():
+def SensorAcusticStart(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.StartRecording("001"))
 
 @app.route('/sensor/acustic/stop', methods=['GET'])
-def SensoreStop():
+def SensorAcusticStop(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.StopRecording("001"))
 
 @app.route('/sensor/acustic/pause', methods=['POST'])
-def SensorePause():
+def SensorAcusticPause(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.PauseRecording("001"))
 
 @app.route('/sensor/acustic/state', methods=['POST'])
-def SensoreState():
+def SensorAcusticState(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify(sensorController.GetRecordingState("001"))
 
 @app.route('/sensor/acustic/', methods=['GET'])
-def Sensors():
+def SensorAcustic(ip:str = "192.168.0.196", port:int = 40999):
+    sensorController = GetSensorController(ip, port)
     return jsonify({
         "sensors": sensorController.GetSensors,
         "time": sensorController.GetSystemTime,
     })
 
 @app.route('/sensor/acustic/config', methods=['GET'])
-def SensoreConfig():
+def SensoreConfig(name:str, verbosity:str):
     return jsonify({
         "config": sensorController.GetConfiguration("001", name=request.form['name'], verbsity=request.form['verbsity']),
     })
 
 @app.route('/sensor/acustic/config', methods=['POST'])
-def SensoreConfig():
-    obj = json.loads(request.json) # in body {config:object, verbosity:str}
+def SensoreConfig(config:object, verbosity:str):
     return jsonify({
         "config": sensorController.Configure("001", config=obj.config, verbsity=obj.verbosity),
     })
@@ -91,3 +103,4 @@ def SensoreConfig():
 if __name__ == '__main__':  
    port = int(os.environ.get('PORT', 5000))
    app.run(debug = True, host='0.0.0.0', port=port)
+   # "192.168.0.196", 40999

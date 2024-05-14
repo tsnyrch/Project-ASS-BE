@@ -7,30 +7,34 @@
 #################################################
 
 from pypylon import pylon
-import cv2
-import platform
 from typing import Literal
 
 class RGB_Camera_Controller:
     
+    save_functions = {
+        'png': pylon.ImageFileFormat_Png,
+        'raw': pylon.ImageFileFormat_Raw,
+        #'jpeg': pylon.ImageFileFormat_Jpeg,
+        'tiff': pylon.ImageFileFormat_Tiff,
+        #'bmp': pylon.ImageFileFormat_Bmp,
+    }
+
     def __init__(self, cameraWith = 1920, cameraHeight = 1080, cameraFormat = "RGB8"):
+ 
+        # Nastavení parametrů kamery
+        self.cameraWith = cameraWith
+        self.cameraHeight = cameraHeight
+        #self.cameraFormat = cameraFormat
+
+    def Connect(self):
         # Inicializace kamery
         self.camera = pylon.InstantCamera(pylon.TlFactory.GetInstance().CreateFirstDevice())
         self.camera.Open()
         
         # Nastavení parametrů kamery
-        self.camera.Width.Value = cameraWith
-        self.camera.Height.Value = cameraHeight
-        #self.camera.PixelFormat = cameraFormat
-
-
-    save_functions = {
-        'png': pylon.ImageFileFormat_Png,
-        'raw': pylon.ImageFileFormat_Raw,
-        'jpeg': pylon.ImageFileFormat_Jpeg,
-        'tiff': pylon.ImageFileFormat_Tiff,
-        'bmp': pylon.ImageFileFormat_Bmp,
-    }
+        self.camera.Width.Value = self.cameraWith
+        self.camera.Height.Value = self.cameraHeight
+        #self.camera.PixelFormat = self.cameraFormat
 
     def acquire_image(self):
         try:

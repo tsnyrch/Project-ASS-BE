@@ -1,0 +1,13 @@
+services:
+  api:
+    build: .
+    container_name: ASS-NSS-API
+    ports:
+      - "${PORT:-5005}:${PORT:-5005}"
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./storage:/app/storage
+    devices:
+      - ${CAMERA_DEVICE:-/dev/null}:/dev/camera

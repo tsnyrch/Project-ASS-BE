@@ -9,3 +9,4 @@ docs/_build/
 dist/
 venv/
 node_modules/
+app.log

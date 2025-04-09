@@ -1,21 +1,19 @@
 ################################################
-## Project: ASS/NSS API 
+## Project: ASS/NSS API
 ## Author: David Michalica, Team 1
 ## Date: 2024
-## 
+##
 ## Documentation: https://bitbucket.org/dakel/node-zedo-rpc/src/master/API.md
 ## alternativni knihovny pro py: pyro4, xmlrpc.server, jsonrpcserver, zerorpc
 #################################################
 
-import socket
-import threading
-import time
 import datetime
 import json
+import socket
+
 
 class SensorController:
-
-    methods =  {
+    methods = {
         "GRFN": "generate_rec_folder_name",
         "CV": "compare_versions",
         "AMV": "assert_min_version",
@@ -55,9 +53,9 @@ class SensorController:
         "WBJF": "WaitBackroundJobFinished",
         "EJPM": "ExportJobProgressMonitor",
         "GII": "GetItemInfo",
-        "GSI": "GetSubItems"
+        "GSI": "GetSubItems",
     }
-    
+
     def __init__(self, ip, port):
         self.IP_ADDR = ip
         self.PORT = port
@@ -66,31 +64,37 @@ class SensorController:
     def Connect(self):
         self.client_socket.connect((self.IP_ADDR, self.PORT))
 
-    def Call(self, method, id, params = {}):
+    def Call(self, method, id, params={}):
         # Vytvoření slovníku s hodnotami pro volání
-        call_values = {
-            'jsonrpc': '2.0', 
-            'method': method, 
-            'id': id,
-            "params": params
-        }
+        call_values = {"jsonrpc": "2.0", "method": method, "id": id, "params": params}
 
         # Převod slovníku na řetězec JSON
         json_string = json.dumps(call_values)
 
         # Převod řetězce JSON na bajty
-        bytes_to_send = json_string.encode('utf-8')    
+        bytes_to_send = json_string.encode("utf-8")
 
         # Odeslání bajtů přes socket
         self.client_socket.send(bytes_to_send)
-        response = self.client_socket.recv(4096)  # Přečte až 4096 bajtů (můžete upravit podle potřeby)
+        response = self.client_socket.recv(
+            4096
+        )  # Přečte až 4096 bajtů (můžete upravit podle potřeby)
 
         # Převod bajtů na řetězec
-        response_string = response.decode('utf-8')   
-        return response_string 
+        response_string = response.decode("utf-8")
+        return response_string
 
-
-    def Generate_rec_folder_name(self, id, prefix:str, use_date:bool = True, use_m:bool = True, use_sec:bool = True, name_delimeter:str = '-', time_delimeter:str = '-', now:datetime = None):
+    def Generate_rec_folder_name(
+        self,
+        id,
+        prefix: str,
+        use_date: bool = True,
+        use_m: bool = True,
+        use_sec: bool = True,
+        name_delimeter: str = "-",
+        time_delimeter: str = "-",
+        now: datetime = None,
+    ):
         """
         Helper call to get date-time folder name
 
@@ -110,11 +114,11 @@ class SensorController:
             "use_date": use_date,
             "use_m": use_m,
             "use_sec": use_sec,
-            "name_delimeter": name_delimeter
+            "name_delimeter": name_delimeter,
         }
         return self.Call(self.methods["GRFN"], id, params)
 
-    def Compare_versions(self, id, ver_a:str, ver_b:str):
+    def Compare_versions(self, id, ver_a: str, ver_b: str):
         """
         Compare version or build strings
 
@@ -129,7 +133,7 @@ class SensorController:
         }
         return self.Call("Compare_versions", id, params)
 
-    def Assert_min_version(self, id, min_version:str, assert_time:str):
+    def Assert_min_version(self, id, min_version: str, assert_time: str):
         """
         Make sure the ZDaemon app is at specific version or above
 
@@ -144,7 +148,7 @@ class SensorController:
         }
         return self.Call("Assert_min_version", id, params)
 
-    def Copy_json(self, id, obj:object):
+    def Copy_json(self, id, obj: object):
         """
         Return a deep copy of given object using JSON stringify/parse methods
 
@@ -156,7 +160,7 @@ class SensorController:
         }
         return self.Call("Copy_json", id, params)
 
-    def Print_json(self, id, obj:object):
+    def Print_json(self, id, obj: object):
         """
         Print formatted JSON object to console
 
@@ -168,7 +172,7 @@ class SensorController:
         }
         return self.Call("Print_json", id, params)
 
-    def Is_json_object(self, id, obj:object):
+    def Is_json_object(self, id, obj: object):
         """
         Generate_rec_folder_name - .
 
@@ -176,13 +180,15 @@ class SensorController:
         :param : describe about parameter p2
         :param : describe about parameter p3
         :return: describe what it returns
-        """ 
+        """
         params = {
             "obj": obj,
         }
         return self.Call("Is_json_object", id, params)
 
-    def Merge_json(self, id, dest, src, overwrite_values:bool, overwrite_objects:bool):
+    def Merge_json(
+        self, id, dest, src, overwrite_values: bool, overwrite_objects: bool
+    ):
         """
         Generate_rec_folder_name - .
 
@@ -190,7 +196,7 @@ class SensorController:
         :param : describe about parameter p2
         :param : describe about parameter p3
         :return: describe what it returns
-        """ 
+        """
         params = {
             "min_version": dest,
             "assert_time": src,
@@ -199,19 +205,19 @@ class SensorController:
         }
         return self.Call("Merge_json", id, params)
 
-    def Is_zdat_directory(self, id, path:str):
+    def Is_zdat_directory(self, id, path: str):
         """
         Determine if local path is a ZEDO data directory (zedodata.zdat file present)
 
         :param path: str - Source data directory or directories to open.
         :return: bool - Test result
-        """ 
+        """
         params = {
             "path": path,
         }
         return self.Call("Is_zdat_directory", id, params)
 
-    def GetSensors(self, id, verbosity:str = "all"):
+    def GetSensors(self, id, verbosity: str = "all"):
         """
         ZEDO RPC call: Obtain array of sensor configurations
 
@@ -241,21 +247,21 @@ class SensorController:
         params = {}
         return self.Call("GetSystemTime", id, params)
 
-    def GetConfiguration(self, id, name:str, verbsity:str):
+    def GetConfiguration(self, id, name: str, verbsity: str):
         """
         ZEDO RPC call: Obtain board unit (AE sensor) configurations
 
         :param name: Union[str, List[str]] - Name of sensor (=board unit) or array of names for sensors for which a configuration is to be returned
         :param verbosity: str - Required verbosity of output; examples: "min", "gain|pulser", .. default is "all"
         :return: Promise<(Object | Array<Object>)> '.then' returns configuration object or array of objects (depending on input type)
-        """ 
+        """
         params = {
             "name": name,
             "verbsity": verbsity,
         }
         return self.Call("GetConfiguration", id, params)
 
-    def Configure(self, id, config:object, verbosity:str):
+    def Configure(self, id, config: object, verbosity: str):
         """
         ZEDO RPC call: Configure one or more sensors, return the actual configuration objects
 
@@ -275,10 +281,12 @@ class SensorController:
 
         :return: Promise '.then' returns the response object (check .status to be zero)
         """
-        params = { }
+        params = {}
         return self.Call("ClearLiveData", id, params)
 
-    def StartRecording(self, id, measurement_name:str = "pokus", record_history_secs:int = 1000):
+    def StartRecording(
+        self, id, measurement_name: str = "pokus", record_history_secs: int = 1000
+    ):
         """
         ZEDO RPC call: Start data recording
 
@@ -296,7 +304,7 @@ class SensorController:
         """
         ZEDO RPC call: Pause data recording
         :return: Promise '.then' returns the response object (check .status to be zero)
-        """ 
+        """
         params = {}
         return self.Call("PauseRecording", id, params)
 
@@ -306,7 +314,7 @@ class SensorController:
 
         :return: Promise '.then' returns the response object (check .status to be zero)
         """
-        params = { }
+        params = {}
         return self.Call("StopRecording", id, params)
 
     def GetRecordingState(self, id):
@@ -315,7 +323,7 @@ class SensorController:
 
         :return: Promise '.then' returns the response object (check .status to be zero)
         """
-        params = { }
+        params = {}
         return self.Call("GetRecordingState", id, params)
 
     def GetAppInfo(self, id):
@@ -323,11 +331,11 @@ class SensorController:
         ZEDO RPC call: Get ZDaemon application information
 
         :return: Promise<Object> '.then' returns the information object
-        """ 
-        params = { }
+        """
+        params = {}
         return self.Call("GetAppInfo", id, params)
 
-    def GetActivePulsers(self, id, passives_too:bool):
+    def GetActivePulsers(self, id, passives_too: bool):
         """
         Get array of board units with activated pulser
 
@@ -339,7 +347,7 @@ class SensorController:
         }
         return self.Call("GetActivePulsers", id, params)
 
-    def AllPulsersOff(self, id, passives_too:bool):
+    def AllPulsersOff(self, id, passives_too: bool):
         """
         Make sure all pulsers are off
 
@@ -351,7 +359,7 @@ class SensorController:
         }
         return self.Call("AllPulsersOff", id, params)
 
-    def pulser_configs_same(self, id, p1:object, p2:object):
+    def pulser_configs_same(self, id, p1: object, p2: object):
         """
         Compare if two pulser configurations are the same, ignore irrelevant parameters
 
@@ -365,7 +373,9 @@ class SensorController:
         }
         return self.Call("pulser_configs_same", id, params)
 
-    def SetPulser(self, id, name:str, pulser:object, retries:int = 3, retry_delay_ms:int = 333):
+    def SetPulser(
+        self, id, name: str, pulser: object, retries: int = 3, retry_delay_ms: int = 333
+    ):
         """
         Set given board unit to specified pulser mode. This function may attempt to retry if pulser activation fails.
 
@@ -383,7 +393,7 @@ class SensorController:
         }
         return self.Call("SetPulser", id, params)
 
-    def EnableContinuousRecording(self, id, name:str, enable:bool):
+    def EnableContinuousRecording(self, id, name: str, enable: bool):
         """
         Enable or disable continuous recording on selected boards (by names)
 
@@ -397,7 +407,7 @@ class SensorController:
         }
         return self.Call("EnableContinuousRecording", id, params)
 
-    def OpenFileReaderByPath(self, id, path:str):
+    def OpenFileReaderByPath(self, id, path: str):
         """
         ZEDO RPC call: Open new or locate existing FileReader object with specific set of source paths
 
@@ -409,7 +419,7 @@ class SensorController:
         }
         return self.Call("OpenFileReaderByPath", id, params)
 
-    def OpenFileReaderByName(self, id, name:str = "pokus"):
+    def OpenFileReaderByName(self, id, name: str = "pokus"):
         """
         ZEDO RPC call: Lookup an existing FileReader object of a given name
 
@@ -421,7 +431,7 @@ class SensorController:
         }
         return self.Call("OpenFileReaderByName", id, params)
 
-    def SetFileReaderPath(self, id, reader_id:int, path:str, update_name:bool):
+    def SetFileReaderPath(self, id, reader_id: int, path: str, update_name: bool):
         """
         ZEDO RPC call: Re-configure FileReader and assign it a new source path
 
@@ -437,7 +447,7 @@ class SensorController:
         }
         return self.Call("SetFileReaderPath", id, params)
 
-    def GetFileReaderInfo(self, id, reader_id:int = 100084):
+    def GetFileReaderInfo(self, id, reader_id: int = 100084):
         """
         ZEDO RPC call: Get File Reader information
 
@@ -450,7 +460,7 @@ class SensorController:
         params = {"reader_id": reader_id}
         return self.Call("GetFileReaderInfo", id, params)
 
-    def GetFileReaderData(self, id, reader_id:int = 100084):
+    def GetFileReaderData(self, id, reader_id: int = 100084):
         """
         ZEDO RPC call: Get File Reader information, list of boards / units and items
 
@@ -462,7 +472,15 @@ class SensorController:
         }
         return self.Call("GetFileReaderData", id, params)
 
-    def ExportFileReaderData(self, id, reader_id:int, outdir:str, subdir:str, export_cfg:object, make_unique_dir:bool):
+    def ExportFileReaderData(
+        self,
+        id,
+        reader_id: int,
+        outdir: str,
+        subdir: str,
+        export_cfg: object,
+        make_unique_dir: bool,
+    ):
         """
         ZEDO RPC call: Export file reader data
 
@@ -482,7 +500,15 @@ class SensorController:
         }
         return self.Call("ExportFileReaderData", id, params)
 
-    def ExportItems(self, id, items:str, outdir:str, subdir:str, export_cfg:object, make_unique_dir:bool):
+    def ExportItems(
+        self,
+        id,
+        items: str,
+        outdir: str,
+        subdir: str,
+        export_cfg: object,
+        make_unique_dir: bool,
+    ):
         """
         ZEDO RPC call: Export multiple file readers or other item's data
 
@@ -502,7 +528,14 @@ class SensorController:
         }
         return self.Call("ExportItems", id, params)
 
-    def CaptureGraphPictures(self, id, subdir:str, export_cfg:object, make_unique_dir:bool, make_unique_files:bool):
+    def CaptureGraphPictures(
+        self,
+        id,
+        subdir: str,
+        export_cfg: object,
+        make_unique_dir: bool,
+        make_unique_files: bool,
+    ):
         """
         Capture graph pictures currently open in ZDaemon into a specific folder.
 
@@ -520,19 +553,19 @@ class SensorController:
         }
         return self.Call("CaptureGraphPictures", id, params)
 
-    def WaitFileReaderScanned(self, id, reader_id:int):
+    def WaitFileReaderScanned(self, id, reader_id: int):
         """
         ZEDO RPC call: Wait until File Reader finishes file scanning
 
         :param reader_id: Number File reader ID received from OpenFileReader
         :return: Promise<Object> '.then' returns the response object (check .status to be zero)
-        """ 
+        """
         params = {
             "reader_id": reader_id,
         }
         return self.Call("WaitFileReaderScanned", id, params)
 
-    def WaitItemsIdle(self, id, items:str):
+    def WaitItemsIdle(self, id, items: str):
         """
         ZEDO RPC call: Wait until all specified items and their child items are idle.
 
@@ -544,7 +577,7 @@ class SensorController:
         }
         return self.Call("WaitItemsIdle", id, params)
 
-    def GetExportJobStatus(self, id, job_id:int):
+    def GetExportJobStatus(self, id, job_id: int):
         """
         ZEDO RPC call: Get status of File Reader Export Job
 
@@ -556,7 +589,7 @@ class SensorController:
         }
         return self.Call("GetExportJobStatus", id, params)
 
-    def AbortExportJob(self, id, job_id:int):
+    def AbortExportJob(self, id, job_id: int):
         """
         ZEDO RPC call: Abort File Reader Export Job
 
@@ -568,7 +601,7 @@ class SensorController:
         }
         return self.Call("AbortExportJob", id, params)
 
-    def WaitBackroundJobFinished(self, id, job_id:int, timeout_seconds:int = 10):
+    def WaitBackroundJobFinished(self, id, job_id: int, timeout_seconds: int = 10):
         """
         ZEDO RPC call: Wait until File Reader Export Job finishes with timeout
 
@@ -582,7 +615,9 @@ class SensorController:
         }
         return self.Call("WaitBackroundJobFinished", id, params)
 
-    def ExportJobProgressMonitor(self, id, job_id:int, period_sec:int, timeout_sec:int, proggress_callback):
+    def ExportJobProgressMonitor(
+        self, id, job_id: int, period_sec: int, timeout_sec: int, proggress_callback
+    ):
         """
         ZEDO RPC call: Start timer to call GetExportJobStatus periodically to monitor the export job
 
@@ -600,7 +635,7 @@ class SensorController:
         }
         return self.Call("ExportJobProgressMonitor", id, params)
 
-    def GetItemInfo(self, id, name:str, verbosity:str = "max"):
+    def GetItemInfo(self, id, name: str, verbosity: str = "max"):
         """
         ZEDO RPC call: Determine if item exists and get its description
 
@@ -614,7 +649,7 @@ class SensorController:
         }
         return self.Call("GetItemInfo", id, params)
 
-    def GetSubItems(self, id, name:str):
+    def GetSubItems(self, id, name: str):
         """
         ZEDO RPC call: Get sub-items of a specified item
 
@@ -626,6 +661,7 @@ class SensorController:
         }
         return self.Call("GetSubItems", id, params)
 
+
 # Příklad použití třídy
 if __name__ == "__main__":
     sensor = SensorController("192.168.0.196", 40999)
@@ -633,7 +669,7 @@ if __name__ == "__main__":
     # response_string = sensor.GetSystemTime("001")
     # response_string = sensor.GetSensors("001")
     # response_string = sensor.GetConfiguration("001") {"jsonrpc":"2.0","id":"001","error":{"code":3,"message":"Unknown method: GetConfiguration"}}
-    #response_string = sensor.StartRecording("001")
+    # response_string = sensor.StartRecording("001")
     # response_string = sensor.StopRecording("001")
     # response_string = sensor.OpenFileReaderByName("001")
     # response_string = sensor.GetFileReaderInfo("001")
